@@ -1,16 +1,12 @@
 #include "transport_catalogue.h"
 #include <cassert>
-
 namespace TransportCatalogue {
 	Bus::Bus(const std::string name, const std::vector<std::string_view>& stops) :
-		name_(name), distance_of_route_(0)
+		name_(name)
 	{
-		std::unordered_set<std::string_view> temp;
 		for (const auto& stop : stops) {
 			stops_.push_back(static_cast<std::string>(stop));
-			temp.insert(stop);
 		}
-		uniq_stops_ = temp.size();
 	}
 
 	void TransportCatalogue::AddStop(const Stop& stop)
@@ -31,21 +27,21 @@ namespace TransportCatalogue {
 
 	}
 
-	Stop* TransportCatalogue::GetStop(const std::string_view& name) const
+	Stop* TransportCatalogue::GetStop(std::string_view name) const
 	{
 		if (stops_index_map_.find(name) == stops_index_map_.end())
 		{
-			assert(false);
+			return nullptr;
 		}
 		return stops_index_map_.at(name);
 	}
 
-	std::set<std::string_view> TransportCatalogue::GetStopInformation(const std::string_view& name) const
+	std::set<std::string_view> TransportCatalogue::GetStopInformation(std::string_view name) const
 	{
 		using namespace std::string_view_literals;
 		if (stops_info_index_map_.find(name) == stops_info_index_map_.end())
 		{
-			return { "not found"sv };
+			return { "not found"sv };//когда нужно будет поменять будет сделалано а так пусть работает...
 		}
 		return stops_info_index_map_.at(name);
 	}
@@ -58,6 +54,7 @@ namespace TransportCatalogue {
 		buses_.push_back(bus);
 		buses_index_map_.insert({ buses_.back().name_,&buses_.back() });
 		for (const auto& stop : buses_.back().stops_) {
+			AddStop(stop);
 			if (stops_info_index_map_.find(stop) != stops_info_index_map_.end())
 			{
 				stops_info_index_map_.at(stop).insert(buses_.back().name_);
@@ -67,20 +64,27 @@ namespace TransportCatalogue {
 		}
 	}
 
-	Bus* TransportCatalogue::GetBus(const std::string_view& name) const
+	Bus* TransportCatalogue::GetBus(std::string_view name) const
 	{
 		if (buses_index_map_.find(name) == buses_index_map_.end()) {
 			return nullptr;
 		}
-		Bus* result = buses_index_map_.at(name);
+		return buses_index_map_.at(name);
+	}
+
+	StatisticOfRoute TransportCatalogue::GetStatisticOfRoute(std::string_view name)const
+	{
+		StatisticOfRoute temp;
+		std::unordered_set<std::string_view> uniq_counter;
+		Bus* result = GetBus(name);
 		std::string_view prev_stop = result->stops_.at(0);
-		if (result->distance_of_route_ != 0) {
-			return result;
-		}
+
 		for (const auto& stop : result->stops_) {
-			result->distance_of_route_ += ComputeDistance(GetStop(prev_stop)->coord_, GetStop(stop)->coord_);
+			temp.distance_of_route_ += ComputeDistance(GetStop(prev_stop)->coord_, GetStop(stop)->coord_);
+			uniq_counter.insert(stop);
 			prev_stop = stop;
 		}
-		return result;
+		temp.uniq_stops_ = uniq_counter.size();
+		return temp;
 	}
 }
