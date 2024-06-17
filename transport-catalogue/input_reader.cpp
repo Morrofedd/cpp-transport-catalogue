@@ -2,6 +2,11 @@
 
 #include <iterator>
 
+struct AdditionalInformation {
+    Coordinates coord_{ 0,0 };
+    std::unordered_map<std::string, int> to_station;
+};
+
 /**
  * Парсит строку вида "10.123,  -30.1837" и возвращает пару координат (широта, долгота)
  */
@@ -72,6 +77,21 @@ std::vector<std::string_view> ParseRoute(std::string_view route) {
     return results;
 }
 
+AdditionalInformation ParseInformation(std::string_view input) {
+    AdditionalInformation info;
+    
+    info.coord_ = ParseCoordinates(input);
+    std::vector<std::string_view> test = Split(input, ',');
+    for (const auto& str : test) {
+        auto trash = str.find("m to ");
+        if (trash != str.npos) {
+            info.to_station.insert({ std::string(str.substr(trash+5)),std::stoi(std::string(str.substr(0,trash))) });
+        }
+    }
+
+    return info;
+}
+
 CommandDescription ParseCommandDescription(std::string_view line) {
     auto colon_pos = line.find(':');
     if (colon_pos == line.npos) {
@@ -104,8 +124,8 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue::TransportCa
     // Реализуйте метод самостоятельно
     for (const auto& command : commands_) {
         if (command.command == "Stop") {
-            Coordinates coord = ParseCoordinates(command.description);
-            catalogue.AddStop({ command.id, coord });
+            AdditionalInformation info = ParseInformation(command.description);
+            catalogue.AddStop({ command.id, info.coord_ }, info.to_station);
             continue;
         }
         if (command.command == "Bus") {
