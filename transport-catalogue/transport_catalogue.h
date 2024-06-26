@@ -23,19 +23,19 @@ namespace TransportCatalogue {
 			coord_.lat = 0;
 			coord_.lng = 0;
 		}
-		std::string name_;
-		Coordinates coord_;
+		std::string name;
+		Coordinates coord;
 	};
 
 	struct Bus {
-		std::string name_;
-		std::vector<std::string_view> stops_;//здесь хронятся только названия string_view инвалидируется
+		std::string name;
+		std::vector<std::string_view> stops;
 	}; 
 	
 	struct StatisticOfRoute {
-		std::size_t uniq_stops_ = 0;
-		double distance_of_route_ = 0;
-		double curvature_ = 0;
+		std::size_t uniq_stops = 0;
+		double distance_of_route = 0;
+		double curvature = 0;
 	};
 
 
