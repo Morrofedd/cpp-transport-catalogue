@@ -42,10 +42,10 @@ namespace TransportCatalogue {
 	class TransportCatalogue {
 	public:
 		void AddStop(const Stop& stop);
-		void AddStop(const Stop& stop, std::unordered_map<std::string, int> ranges);
-		void AddRanges(std::string_view from, std::string_view to, int range);
+		void AddStopWithRanges(const Stop& stop, std::unordered_map<std::string, int> ranges);
+		void AddRangesBetweenStops(std::string_view from, std::string_view to, int range);
 		Stop* GetStop(std::string_view name) const;
-		double GetRanges(std::string_view from, std::string_view to) const;
+		double GetRangesBetweenStops(std::string_view from, std::string_view to) const;
 		std::set<std::string_view> GetStopInformation(std::string_view name) const;
 		void AddBus(const Bus& bus);
 		Bus* GetBus(std::string_view name)const;

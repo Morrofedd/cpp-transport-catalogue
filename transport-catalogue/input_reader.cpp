@@ -125,7 +125,7 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue::TransportCa
     for (const auto& command : commands_) {
         if (command.command == "Stop") {
             AdditionalInformation info = ParseInformation(command.description);
-            catalogue.AddStop({ command.id, info.coord_ }, info.to_station);
+            catalogue.AddStopWithRanges({ command.id, info.coord_ }, info.to_station);
             continue;
         }
         if (command.command == "Bus") {

@@ -21,11 +21,11 @@ namespace TransportCatalogue {
 
 	}
 
-	void TransportCatalogue::AddStop(const Stop& stop, std::unordered_map<std::string, int> ranges)
+	void TransportCatalogue::AddStopWithRanges(const Stop& stop, std::unordered_map<std::string, int> ranges)
 	{
 		AddStop(stop);
 		for (const auto& [to, range] : ranges) {
-			AddRanges(stop.name_, to, range);
+			AddRangesBetweenStops(stop.name_, to, range);
 		}
 	}
 
@@ -38,7 +38,7 @@ namespace TransportCatalogue {
 		return stops_index_map_.at(name);
 	}
 
-	void TransportCatalogue::AddRanges(std::string_view from, std::string_view to, int range)
+	void TransportCatalogue::AddRangesBetweenStops(std::string_view from, std::string_view to, int range)
 	{
 		if (!GetStop(to)) {
 			AddStop(static_cast<std::string>(to));
@@ -49,7 +49,7 @@ namespace TransportCatalogue {
 			});
 	}
 
-	double TransportCatalogue::GetRanges(std::string_view from, std::string_view to) const
+	double TransportCatalogue::GetRangesBetweenStops(std::string_view from, std::string_view to) const
 	{
 		std::pair< Stop*, Stop*> stop_pair = std::make_pair<Stop*, Stop*>(GetStop(from), GetStop(to));
 		if (stops_ranges_.find(stop_pair) == stops_ranges_.end()) {
@@ -109,7 +109,7 @@ namespace TransportCatalogue {
 		std::string_view prev_stop = result->stops_.at(0);
 
 		for (const auto& stop : result->stops_) {
-			temp.distance_of_route_ += GetRanges(prev_stop,stop);
+			temp.distance_of_route_ += GetRangesBetweenStops(prev_stop,stop);
 			temp.curvature_ += ComputeDistance(GetStop(prev_stop)->coord_, GetStop(stop)->coord_);
 			uniq_counter.insert(stop);
 			prev_stop = stop;
