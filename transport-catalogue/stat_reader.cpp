@@ -45,11 +45,11 @@ void PrintBus(const TransportCatalogue::TransportCatalogue& transport_catalogue,
         return;
     }
     TransportCatalogue::StatisticOfRoute statistic = transport_catalogue.GetStatisticOfRoute(request_.name);
-    output << "Bus " << requested->name_
-        << ": " << requested->stops_.size()<< " stops on route, " 
-        << statistic.uniq_stops_<< " unique stops, " 
-        << statistic.distance_of_route_<< " route length, " 
-        << statistic.curvature_<< " curvature" << std::endl;
+    output << "Bus " << requested->name
+        << ": " << requested->stops.size()<< " stops on route, " 
+        << statistic.uniq_stops<< " unique stops, " 
+        << statistic.distance_of_route<< " route length, " 
+        << statistic.curvature<< " curvature" << std::endl;
 }
 
 void PrintStop(const TransportCatalogue::TransportCatalogue& tansport_catalogue, req& request_, std::ostream& output)
