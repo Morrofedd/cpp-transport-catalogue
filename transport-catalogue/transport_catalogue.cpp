@@ -5,28 +5,20 @@ namespace TransportCatalogue {
 
 	void TransportCatalogue::AddStop(const Stop& stop)
 	{
-		if (stops_index_map_.count(stop.name_) != 0) {
-			if (stop.coord_.lat == 0 && stop.coord_.lng == 0) {
+		if (stops_index_map_.count(stop.name) != 0) {
+			if (stop.coord.lat == 0 && stop.coord.lng == 0) {
 				return;
 			}
-			stops_index_map_.at(stop.name_)->coord_ = stop.coord_;
+			stops_index_map_.at(stop.name)->coord = stop.coord;
 			return;
 		}
 		stops_.push_back(stop);
-		stops_index_map_.insert({ stops_.back().name_,&stops_.back() });
-		if (stops_info_index_map_.find(stops_.back().name_) == stops_info_index_map_.end())
+		stops_index_map_.insert({ stops_.back().name,&stops_.back() });
+		if (stops_info_index_map_.find(stops_.back().name) == stops_info_index_map_.end())
 		{
-			stops_info_index_map_[stops_.back().name_];
+			stops_info_index_map_[stops_.back().name];
 		}
 
-	}
-
-	void TransportCatalogue::AddStopWithRanges(const Stop& stop, std::unordered_map<std::string, int> ranges)
-	{
-		AddStop(stop);
-		for (const auto& [to, range] : ranges) {
-			AddRangesBetweenStops(stop.name_, to, range);
-		}
 	}
 
 	Stop* TransportCatalogue::GetStop(std::string_view name) const
@@ -38,15 +30,17 @@ namespace TransportCatalogue {
 		return stops_index_map_.at(name);
 	}
 
-	void TransportCatalogue::AddRangesBetweenStops(std::string_view from, std::string_view to, int range)
+	void TransportCatalogue::AddRangesBetweenStops(std::string_view from, std::unordered_map<std::string, int> stops_and_ranges)
 	{
-		if (!GetStop(to)) {
-			AddStop(static_cast<std::string>(to));
+		for (const auto& [to, range] : stops_and_ranges) {
+			if (!GetStop(to)) {
+				AddStop(to);
+			}
+			stops_ranges_.insert({
+					std::make_pair<Stop*, Stop*>(GetStop(from),GetStop(to)),
+					range
+				});
 		}
-		stops_ranges_.insert({
-				std::make_pair<Stop*, Stop*>(GetStop(from),GetStop(to)),
-				range
-			});
 	}
 
 	double TransportCatalogue::GetRangesBetweenStops(std::string_view from, std::string_view to) const
@@ -73,22 +67,22 @@ namespace TransportCatalogue {
 
 	void TransportCatalogue::AddBus(const Bus& bus)
 	{
-		if (buses_index_map_.count(bus.name_) != 0) {
+		if (buses_index_map_.count(bus.name) != 0) {
 			return;
 		}
 		buses_.push_back(bus);
-		buses_index_map_.insert({ buses_.back().name_,&buses_.back() });
-		for (const auto& stop : buses_.back().stops_) {
+		buses_index_map_.insert({ buses_.back().name,&buses_.back() });
+		for (const auto& stop : buses_.back().stops) {
 			AddStop(static_cast<std::string>(stop));
 			if (stops_info_index_map_.find(stop) != stops_info_index_map_.end())
 			{
-				stops_info_index_map_.at(stop).insert(buses_.back().name_);
+				stops_info_index_map_.at(stop).insert(buses_.back().name);
 				continue;
 			}
-			stops_info_index_map_[stop] = { buses_.back().name_ };
+			stops_info_index_map_[stop] = { buses_.back().name };
 		}
-		for (auto i = buses_.back().stops_.begin(); i < buses_.back().stops_.end(); i++) {
-			*i = GetStop(*i)->name_;
+		for (auto i = buses_.back().stops.begin(); i < buses_.back().stops.end(); i++) {
+			*i = GetStop(*i)->name;
 		}
 	}
 
@@ -106,20 +100,20 @@ namespace TransportCatalogue {
 		std::unordered_set<std::string_view> uniq_counter;
 
 		Bus* result = GetBus(name);
-		std::string_view prev_stop = result->stops_.at(0);
+		std::string_view prev_stop = result->stops.at(0);
 
-		for (const auto& stop : result->stops_) {
-			temp.distance_of_route_ += GetRangesBetweenStops(prev_stop,stop);
-			temp.curvature_ += ComputeDistance(GetStop(prev_stop)->coord_, GetStop(stop)->coord_);
+		for (const auto& stop : result->stops) {
+			temp.distance_of_route += GetRangesBetweenStops(prev_stop,stop);
+			temp.curvature += ComputeDistance(GetStop(prev_stop)->coord, GetStop(stop)->coord);
 			uniq_counter.insert(stop);
 			prev_stop = stop;
 		}
 
-		if (temp.curvature_ != 0) {
-			temp.curvature_ = temp.distance_of_route_ / temp.curvature_;
+		if (temp.curvature != 0) {
+			temp.curvature = temp.distance_of_route / temp.curvature;
 		}
 
-		temp.uniq_stops_ = uniq_counter.size();
+		temp.uniq_stops = uniq_counter.size();
 		return temp;
 	}
 }

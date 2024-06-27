@@ -16,12 +16,12 @@
 namespace TransportCatalogue {
 
 	struct Stop {
-		Stop(const std::string name, const Coordinates coord) :
-			name_(name), coord_(coord) {};
+		Stop(const std::string Name, const Coordinates Coord) :
+			name(Name), coord(Coord) {};
 		Stop(std::string name) :
-			name_(name) {
-			coord_.lat = 0;
-			coord_.lng = 0;
+			name(name) {
+			coord.lat = 0;
+			coord.lng = 0;
 		}
 		std::string name;
 		Coordinates coord;
@@ -42,8 +42,7 @@ namespace TransportCatalogue {
 	class TransportCatalogue {
 	public:
 		void AddStop(const Stop& stop);
-		void AddStopWithRanges(const Stop& stop, std::unordered_map<std::string, int> ranges);
-		void AddRangesBetweenStops(std::string_view from, std::string_view to, int range);
+		void AddRangesBetweenStops(std::string_view from, std::unordered_map<std::string,int> stops_and_ranges);
 		Stop* GetStop(std::string_view name) const;
 		double GetRangesBetweenStops(std::string_view from, std::string_view to) const;
 		std::set<std::string_view> GetStopInformation(std::string_view name) const;

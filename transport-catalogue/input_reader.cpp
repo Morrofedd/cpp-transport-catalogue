@@ -3,7 +3,7 @@
 #include <iterator>
 
 struct AdditionalInformation {
-    Coordinates coord_{ 0,0 };
+    Coordinates coord{ 0,0 };
     std::unordered_map<std::string, int> to_station;
 };
 
@@ -80,7 +80,7 @@ std::vector<std::string_view> ParseRoute(std::string_view route) {
 AdditionalInformation ParseInformation(std::string_view input) {
     AdditionalInformation info;
     
-    info.coord_ = ParseCoordinates(input);
+    info.coord = ParseCoordinates(input);
     std::vector<std::string_view> test = Split(input, ',');
     for (const auto& str : test) {
         auto trash = str.find("m to ");
@@ -125,7 +125,8 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue::TransportCa
     for (const auto& command : commands_) {
         if (command.command == "Stop") {
             AdditionalInformation info = ParseInformation(command.description);
-            catalogue.AddStopWithRanges({ command.id, info.coord_ }, info.to_station);
+            catalogue.AddStop({ command.id, info.coord });
+            catalogue.AddRangesBetweenStops(command.id, info.to_station);
             continue;
         }
         if (command.command == "Bus") {
