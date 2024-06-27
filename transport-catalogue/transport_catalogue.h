@@ -30,7 +30,6 @@ namespace TransportCatalogue {
 	struct Bus {
 		std::string name;
 		std::vector<std::string_view> stops;
-	}; 
 	
 	struct StatisticOfRoute {
 		std::size_t uniq_stops = 0;
