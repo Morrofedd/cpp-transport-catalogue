@@ -30,7 +30,7 @@ namespace TransportCatalogue {
 	struct Bus {
 		std::string name;
 		std::vector<std::string_view> stops;
-	
+	}
 	struct StatisticOfRoute {
 		std::size_t uniq_stops = 0;
 		double distance_of_route = 0;
@@ -43,7 +43,7 @@ namespace TransportCatalogue {
 		void AddStop(const Stop& stop);
 		void AddRangesBetweenStops(std::string_view from, std::unordered_map<std::string,int> stops_and_ranges);
 		Stop* GetStop(std::string_view name) const;
-		double GetRangesBetweenStops(std::string_view from, std::string_view to) const;
+		int GetRangesBetweenStops(std::string_view from, std::string_view to) const;
 		std::set<std::string_view> GetStopInformation(std::string_view name) const;
 		void AddBus(const Bus& bus);
 		Bus* GetBus(std::string_view name)const;
