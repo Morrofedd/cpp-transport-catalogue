@@ -41,7 +41,7 @@ namespace TransportCatalogue {
 			});
 	}
 
-	double TransportCatalogue::GetRangesBetweenStops(std::string_view from, std::string_view to) const
+	int TransportCatalogue::GetRangesBetweenStops(std::string_view from, std::string_view to) const
 	{
 		std::pair< Stop*, Stop*> stop_pair = std::make_pair<Stop*, Stop*>(GetStop(from), GetStop(to));
 		if (stops_ranges_.find(stop_pair) == stops_ranges_.end()) {
