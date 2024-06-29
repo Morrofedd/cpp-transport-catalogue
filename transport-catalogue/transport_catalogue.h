@@ -41,7 +41,7 @@ namespace TransportCatalogue {
 	class TransportCatalogue {
 	public:
 		void AddStop(const Stop& stop);
-		void AddRangesBetweenStops(std::string_view from, std::unordered_map<std::string,int> stops_and_ranges);
+		void AddRangesBetweenStops(std::string_view from, std::string_view to, int range);
 		Stop* GetStop(std::string_view name) const;
 		int GetRangesBetweenStops(std::string_view from, std::string_view to) const;
 		std::set<std::string_view> GetStopInformation(std::string_view name) const;

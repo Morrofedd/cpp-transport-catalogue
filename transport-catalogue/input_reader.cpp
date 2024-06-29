@@ -79,13 +79,13 @@ std::vector<std::string_view> ParseRoute(std::string_view route) {
 
 AdditionalInformation ParseInformation(std::string_view input) {
     AdditionalInformation info;
-    
+
     info.coord = ParseCoordinates(input);
     std::vector<std::string_view> test = Split(input, ',');
     for (const auto& str : test) {
         auto trash = str.find("m to ");
         if (trash != str.npos) {
-            info.to_station.insert({ std::string(str.substr(trash+5)),std::stoi(std::string(str.substr(0,trash))) });
+            info.to_station.insert({ std::string(str.substr(trash + 5)),std::stoi(std::string(str.substr(0,trash))) });
         }
     }
 
@@ -126,11 +126,13 @@ void InputReader::ApplyCommands([[maybe_unused]] TransportCatalogue::TransportCa
         if (command.command == "Stop") {
             AdditionalInformation info = ParseInformation(command.description);
             catalogue.AddStop({ command.id, info.coord });
-            catalogue.AddRangesBetweenStops(command.id, info.to_station);
+            for (const auto& [to, range] : info.to_station) {
+                catalogue.AddRangesBetweenStops(command.id, to, range);
+            }
             continue;
         }
         if (command.command == "Bus") {
-            catalogue.AddBus({ command.id, ParseRoute(command.description) });
+            //catalogue.AddBus({ command.id, ParseRoute(command.description) });
             continue;
         }
     }

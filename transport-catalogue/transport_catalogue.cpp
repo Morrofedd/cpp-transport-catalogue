@@ -30,17 +30,15 @@ namespace TransportCatalogue {
 		return stops_index_map_.at(name);
 	}
 
-	void TransportCatalogue::AddRangesBetweenStops(std::string_view from, std::unordered_map<std::string, int> stops_and_ranges)
+	void TransportCatalogue::AddRangesBetweenStops(std::string_view from, std::string_view to, int range)
 	{
-		for (const auto& [to, range] : stops_and_ranges) {
-			if (!GetStop(to)) {
-				AddStop(to);
-			}
-			stops_ranges_.insert({
-					std::make_pair<Stop*, Stop*>(GetStop(from),GetStop(to)),
-					range
-				});
+		if (!GetStop(to)) {
+			AddStop(std::string(to));
 		}
+		stops_ranges_.insert({
+				std::make_pair<Stop*, Stop*>(GetStop(from),GetStop(to)),
+				range
+			});
 	}
 
 	double TransportCatalogue::GetRangesBetweenStops(std::string_view from, std::string_view to) const
