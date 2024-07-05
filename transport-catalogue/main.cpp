@@ -2,36 +2,19 @@
 #include <cstdio>
 #include <string>
 
-#include "input_reader.h"
-#include "stat_reader.h"
+//#include "log_duration.h"
+#include "json_reader.h"
+#include "request_handler.h"
+#include "map_renderer.h"
 
 using namespace std;
 
 int main() {
-
-    //freopen("input.txt", "r", stdin);
-    //freopen("output.txt", "w", stdout);
-
     TransportCatalogue::TransportCatalogue catalogue;
-
-    int base_request_count;
-    cin >> base_request_count >> ws;
-
+    json_reader reader(cin);
+    request_handler rh(catalogue,reader);
     {
-        InputReader reader;
-        for (int i = 0; i < base_request_count; ++i) {
-            string line;
-            getline(cin, line);
-            reader.ParseLine(line);
-        }
-        reader.ApplyCommands(catalogue);
-    }
-
-    int stat_request_count;
-    cin >> stat_request_count >> ws;
-    for (int i = 0; i < stat_request_count; ++i) {
-        string line;
-        getline(cin, line);
-        ParseAndPrintStat(catalogue, line, cout);
+        //LOG_DURATION_STREAM("in", cerr);
+        rh.MakeRequest(cout);
     }
 }
