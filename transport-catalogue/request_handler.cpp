@@ -1,6 +1,6 @@
 #include "request_handler.h"
 #include "map_renderer.h"
-
+//В сдачу следующего спринта все будет переработанно
 //ctor
 request_handler::request_handler(TransportCatalogue::TransportCatalogue& catalogue, json_reader& reader):catalogue_(catalogue),reader_(reader)
 {
@@ -35,7 +35,8 @@ void request_handler::RequestAnser(std::ostream& output)
 }
 
 //private class function
-
+//будет перенесенно в json_reader!
+//изначально думал, чтобы не выносить лишний раз каталог за придел класс, сделать здесь обработчик запросов
 json::Node request_handler::StatRequestHundle(const json::Node& Root) const
 {
     json::Array result;//Array of map

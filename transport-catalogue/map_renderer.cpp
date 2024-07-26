@@ -6,9 +6,18 @@ svg::Color JSONtoColor(json::Node color) {
 		return color.AsString();
 	}
 	if (color.AsArray().size() == 3) {
-		return svg::Rgb(color.AsArray()[0].AsInt(), color.AsArray()[1].AsInt(), color.AsArray()[2].AsInt());
+		return svg::Rgb(
+			color.AsArray()[0].AsInt(), 
+			color.AsArray()[1].AsInt(), 
+			color.AsArray()[2].AsInt()
+			);
 	}
-	return svg::Rgba(color.AsArray()[0].AsInt(), color.AsArray()[1].AsInt(), color.AsArray()[2].AsInt(), color.AsArray()[3].AsDouble());
+	return svg::Rgba(
+		color.AsArray()[0].AsInt(),
+		color.AsArray()[1].AsInt(), 
+		color.AsArray()[2].AsInt(), 
+		color.AsArray()[3].AsDouble()
+		);
 }
 
 svg::Color JSONtoColor(json::Array array,int index) {
@@ -17,9 +26,18 @@ svg::Color JSONtoColor(json::Array array,int index) {
 		return temp.AsString();
 	}
 	if (temp.AsArray().size() == 3) {
-		return svg::Rgb(temp.AsArray()[0].AsInt(), temp.AsArray()[1].AsInt(), temp.AsArray()[2].AsInt());
+		return svg::Rgb(
+			temp.AsArray()[0].AsInt(), 
+			temp.AsArray()[1].AsInt(), 
+			temp.AsArray()[2].AsInt()
+			);
 	}
-	return svg::Rgba(temp.AsArray()[0].AsInt(), temp.AsArray()[1].AsInt(), temp.AsArray()[2].AsInt(), temp.AsArray()[3].AsDouble());
+	return svg::Rgba(
+		temp.AsArray()[0].AsInt(), 
+		temp.AsArray()[1].AsInt(), 
+		temp.AsArray()[2].AsInt(), 
+		temp.AsArray()[3].AsDouble()
+		);
 }
 
 svg::Point JSONtoPoint(json::Array array) {
