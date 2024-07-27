@@ -93,7 +93,7 @@
 			return buses_index_map_.at(name);
 		}
 
-		std::vector<std::string_view> TransportCatalogue::GetNamesOfAllRouts()
+		std::vector<std::string_view> TransportCatalogue::GetNamesOfAllRouts() const
 		{
 			std::vector<std::string_view> result;
 

@@ -20,10 +20,10 @@ namespace TransportCatalogue {
 		std::set<std::string_view> GetStopInformation(std::string_view name) const;
 		void AddBus(const Bus& bus);
 		Bus* GetBus(std::string_view name)const;
-		std::vector<std::string_view> GetNamesOfAllRouts();
+		std::vector<std::string_view> GetNamesOfAllRouts() const;
 		StatisticOfRoute GetStatisticOfRoute(std::string_view name) const;
 
-		MinMaxCoords min_max_coords;
+		mutable MinMaxCoords min_max_coords;
 	private:
 		struct StopPtrHasher {
 			std::size_t operator() (const std::pair< Stop*, Stop*> s) const noexcept {

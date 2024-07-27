@@ -1,9 +1,7 @@
 #pragma once
 
 #include "domain.h"
-#include "geo.h"
 #include "json_reader.h"
-#include "svg.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -100,7 +98,7 @@ class map_renderer
 {
 public:
     map_renderer() = delete;
-    map_renderer(TransportCatalogue::TransportCatalogue&, json_reader&);
+    map_renderer(const TransportCatalogue::TransportCatalogue&, const json_reader&);
 
     void MapRander(std::ostream& output);
 
@@ -114,7 +112,7 @@ private:
 
 private:
     SphereProjector sp_;
-    json::Dict settings_;
-    TransportCatalogue::TransportCatalogue& catalogue_;
+    const TransportCatalogue::TransportCatalogue& catalogue_;
+    const Settings settings_;
 };
 

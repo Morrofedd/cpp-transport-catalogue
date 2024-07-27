@@ -1,54 +1,13 @@
 #include "map_renderer.h"
-//non-class functions
-
-svg::Color JSONtoColor(json::Node color) {
-	if (color.IsString()) {
-		return color.AsString();
-	}
-	if (color.AsArray().size() == 3) {
-		return svg::Rgb(
-			color.AsArray()[0].AsInt(), 
-			color.AsArray()[1].AsInt(), 
-			color.AsArray()[2].AsInt()
-			);
-	}
-	return svg::Rgba(
-		color.AsArray()[0].AsInt(),
-		color.AsArray()[1].AsInt(), 
-		color.AsArray()[2].AsInt(), 
-		color.AsArray()[3].AsDouble()
-		);
-}
-
-svg::Color JSONtoColor(json::Array array,int index) {
-	json::Node temp = array[index % array.size()];
-	if (temp.IsString()) {
-		return temp.AsString();
-	}
-	if (temp.AsArray().size() == 3) {
-		return svg::Rgb(
-			temp.AsArray()[0].AsInt(), 
-			temp.AsArray()[1].AsInt(), 
-			temp.AsArray()[2].AsInt()
-			);
-	}
-	return svg::Rgba(
-		temp.AsArray()[0].AsInt(), 
-		temp.AsArray()[1].AsInt(), 
-		temp.AsArray()[2].AsInt(), 
-		temp.AsArray()[3].AsDouble()
-		);
-}
-
-svg::Point JSONtoPoint(json::Array array) {
-	return { array.at(0).AsDouble(), array.at(1).AsDouble() };
-}
 
 //class functions
 
-map_renderer::map_renderer(TransportCatalogue::TransportCatalogue& catalogue, json_reader& reader) :catalogue_(catalogue)
+
+
+map_renderer::map_renderer(const TransportCatalogue::TransportCatalogue& catalogue, const json_reader& reader):
+	catalogue_(catalogue),
+	settings_(reader)
 {
-	settings_ = reader.GetNode("render_settings").AsMap();
 }
 
 void map_renderer::MapRander(std::ostream& output)
@@ -60,7 +19,7 @@ svg::Document map_renderer::MakeRenderDocument()
 {
 	auto arr = catalogue_.GetNamesOfAllRouts();
 
-	sp_ = SphereProjector(catalogue_.min_max_coords, settings_.at("width").AsDouble(), settings_.at("height").AsDouble(), settings_.at("padding").AsDouble());
+	sp_ = SphereProjector(catalogue_.min_max_coords, settings_.width, settings_.height, settings_.padding);
 
 	svg::Document result;
 	std::set<std::string_view> UsedStops;
@@ -111,8 +70,11 @@ std::set<std::string_view> map_renderer::MakeRoute(svg::Document& doc, std::stri
 
 	std::set<std::string_view> UsedStops;
 	svg::Polyline result;
-	result.SetFillColor("none").SetStrokeColor(JSONtoColor(settings_.at("color_palette").AsArray(),index)).SetStrokeWidth(settings_.at("line_width").AsDouble());
-	result.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND).SetStrokeLineCap(svg::StrokeLineCap::ROUND);
+	result.SetFillColor("none")
+		.SetStrokeColor(settings_.color_palette.at(index% settings_.color_palette.size()))
+		.SetStrokeWidth(settings_.line_width)
+		.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND)
+		.SetStrokeLineCap(svg::StrokeLineCap::ROUND);
 
 	std::vector<geo::Coordinates> coords;
 	for (const auto& stop : catalogue_.GetBus(name)->stops) {
@@ -140,21 +102,21 @@ svg::Text map_renderer::MakeText(std::string content, int index, LayerType l_typ
 	if (r_type == request_type::Stop_type) {
 		result
 			.SetFillColor("black")
-			.SetFontSize(settings_.at("stop_label_font_size").AsInt())
-			.SetOffset(JSONtoPoint(settings_.at("stop_label_offset").AsArray()));
+			.SetFontSize(settings_.stop_label_font_size)
+			.SetOffset(settings_.stop_label_offset);
 	}
 	if (r_type == request_type::Bus_type) {
 		result
-			.SetFillColor(JSONtoColor(settings_.at("color_palette").AsArray(), index))
+			.SetFillColor(settings_.color_palette.at(index % settings_.color_palette.size()))
 			.SetFontWeight("bold")
-			.SetFontSize(settings_.at("bus_label_font_size").AsInt())
-			.SetOffset(JSONtoPoint(settings_.at("bus_label_offset").AsArray()));
+			.SetFontSize(settings_.bus_label_font_size)
+			.SetOffset(settings_.bus_label_offset);
 	}
 	if (l_type == LayerType::LOWER) {
 		result
-			.SetFillColor(JSONtoColor(settings_.at("underlayer_color")))
-			.SetStrokeColor(JSONtoColor(settings_.at("underlayer_color")))
-			.SetStrokeWidth(settings_.at("underlayer_width").AsDouble())
+			.SetFillColor(settings_.underlayer_color)
+			.SetStrokeColor(settings_.underlayer_color)
+			.SetStrokeWidth(settings_.underlayer_width)
 			.SetStrokeLineCap(svg::StrokeLineCap::ROUND)
 			.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
 	}
@@ -213,6 +175,9 @@ void map_renderer::MakeNameOfStop(svg::Document& doc, std::string_view name)
 
 void map_renderer::MakeCircle(std::string_view name, svg::Document& doc) {
 	svg::Circle circle;
-	circle.SetCenter(sp_(catalogue_.GetStop(name)->coord)).SetRadius(settings_.at("stop_radius").AsDouble()).SetFillColor("white");
+	circle
+		.SetCenter(sp_(catalogue_.GetStop(name)->coord))
+		.SetRadius(settings_.stop_radius)
+		.SetFillColor("white");
 	doc.Add(circle);
 }
