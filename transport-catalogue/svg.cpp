@@ -158,7 +158,7 @@ namespace svg {
             obj->Render({ out, 2, 2 });
         }
 
-        out << "</svg>"sv << std::endl;
+        out << "</svg>"sv;
     }
 
 }  // namespace svg

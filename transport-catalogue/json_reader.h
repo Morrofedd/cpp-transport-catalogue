@@ -1,5 +1,6 @@
 #pragma once
 
+#include "graph.h"
 #include "svg.h"
 #include "json.h"
 #include "json_builder.h"
@@ -26,6 +27,8 @@ TransportCatalogue::StopAndHisNaiboor JSONtoStop(const json::Node& root);
 TransportCatalogue::Bus JSONtoBus(const json::Node& root);
 
 std::pair<request_type, RequestValue> JSONtoRequestElement(const json::Node& root);
+std::vector < std::pair< request_type, RequestValue>> BaseRequestHundle(const json::Node& root);
+TransportCatalogue::RouteSettings ParseTimeAndVelocity(const json::Node& root);
 
 struct Settings {
 	Settings() = delete;
@@ -37,8 +40,8 @@ struct Settings {
 	double underlayer_width;
 	double line_width;
 	double stop_radius;
-	int bus_label_font_size;
 	int stop_label_font_size;
+	int bus_label_font_size;
 	std::vector<svg::Color> color_palette;
 	svg::Color underlayer_color;
 	svg::Point bus_label_offset;
