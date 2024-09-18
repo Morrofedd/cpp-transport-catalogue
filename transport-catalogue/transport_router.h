@@ -14,11 +14,11 @@ public:
 	TransportRouter(const TransportCatalogue::TransportCatalogue& catalogue) :
 		catalogue_(catalogue), 
 		graph_(BuildGraph(catalogue)), 
-		router_(graph_) //Router должен быть проинициализирован с помощью уже готового графа и его нельзя потом скопировать или переместить
+		router_(graph_) //Cейчас по сути так и работает
 	{};
 
 	std::optional<graph::Router<WeightValue>::RouteInfo> BuildPath(std::string_view from,std::string_view to)const;
-	const graph::Edge<WeightValue>& GetEdge(graph::EdgeId id)const;
+	const graph::Edge<WeightValue>& GetEdge(graph::EdgeId id)const;//текста в "надо исправить" нет
 
 private:
 	const TransportCatalogue::TransportCatalogue& catalogue_;
