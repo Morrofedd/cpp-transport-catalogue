@@ -22,12 +22,13 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
         //в зависимости от типа маршрута свой расчёт
         int length = 0;
         const TransportCatalogue::Bus* cur_route_ptr = catalogue.GetBus(cur_route);
-        const int cur_route_size = static_cast<int>(cur_route_ptr->stops.size());
+        const std::vector<std::string>& stops = cur_route_ptr->stops;
+        const int cur_route_size = static_cast<int>(stops.size());
         if (cur_route_ptr->is_roundtrip) {
             graph.AddEdge(
-                graph::Edge<double>{
-                    catalogue.GetStopId(cur_route_ptr->stops.at(0)),
-                    catalogue.GetStopId(cur_route_ptr->stops.at(0)) + n,
+                graph::Edge<WeightValue>{
+                    catalogue.GetStopId(stops.at(0)),
+                    catalogue.GetStopId(stops.at(0)) + n,
                     bus_settings.wait_time
                 }
             );
@@ -39,15 +40,15 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
 
                     //итоговый путь равен сумме путей по предыдущим узлам, плюс новый
                     length += catalogue.GetRangesBetweenStops(
-                        cur_route_ptr->stops.at(destination_idx - 1),
-                        cur_route_ptr->stops.at(destination_idx)// sec/60 == minuts
+                        stops.at(destination_idx - 1),
+                        stops.at(destination_idx)// sec/60 == minuts
                     );
 
                     // //создаём новую грань
                     graph.AddEdge(
-                        graph::Edge<double>{
-                            catalogue.GetStopId(cur_route_ptr->stops.at(departure_idx)),
-                            catalogue.GetStopId(cur_route_ptr->stops.at(destination_idx)) + n,
+                        graph::Edge<WeightValue>{
+                            catalogue.GetStopId(stops.at(departure_idx)),
+                            catalogue.GetStopId(stops.at(destination_idx)) + n,
                             ComputeTimeToTravel(length, bus_settings.velocity) / 60
                     }
                     );
@@ -62,15 +63,15 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
 
                 //итоговый путь равен сумме путей по предыдущим узлам, плюс новый
                 length += catalogue.GetRangesBetweenStops(
-                    cur_route_ptr->stops.at(destination_idx - 1),
-                    cur_route_ptr->stops.at(destination_idx)
+                    stops.at(destination_idx - 1),
+                    stops.at(destination_idx)
                 );
 
                 //создаём новую грань
                 graph.AddEdge(
-                    graph::Edge<double>{
-                        catalogue.GetStopId(cur_route_ptr->stops.at(departure_idx)),
-                        catalogue.GetStopId(cur_route_ptr->stops.at(destination_idx)) + n,
+                    graph::Edge<WeightValue>{
+                        catalogue.GetStopId(stops.at(departure_idx)),
+                        catalogue.GetStopId(stops.at(destination_idx)) + n,
                         ComputeTimeToTravel(length, bus_settings.velocity) / 60// sec/60 == minuts
                 }
                 );
@@ -82,15 +83,15 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
             for (int destination_idx = departure_idx - 1; destination_idx >= 0; destination_idx--) {
                 //итоговый путь равен сумме путей по предыдущим узлам, плюс новый
                 length += catalogue.GetRangesBetweenStops(
-                    cur_route_ptr->stops.at(destination_idx + 1),
-                    cur_route_ptr->stops.at(destination_idx)
+                    stops.at(destination_idx + 1),
+                    stops.at(destination_idx)
                 );
 
                 //создаём новую грань
                 graph.AddEdge(
-                    graph::Edge<double>{
-                        catalogue.GetStopId(cur_route_ptr->stops.at(departure_idx)),
-                        catalogue.GetStopId(cur_route_ptr->stops.at(destination_idx)) + n,
+                    graph::Edge<WeightValue>{
+                        catalogue.GetStopId(stops.at(departure_idx)),
+                        catalogue.GetStopId(stops.at(destination_idx)) + n,
                         ComputeTimeToTravel(length, bus_settings.velocity) / 60// sec/60 == minuts
                 }
                 );
@@ -98,7 +99,7 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
         }
 
     }
-
+    //Нет хорошей идеи как это упростить
     return graph;
 }
 
@@ -107,12 +108,7 @@ std::optional<graph::Router<WeightValue>::RouteInfo> TransportRouter::BuildPath(
     return router_.BuildRoute(catalogue_.GetStopId(from),catalogue_.GetStopId(to));
 }
 
-const graph::Router<WeightValue>& TransportRouter::GetRouter() const
+const graph::Edge<WeightValue>& TransportRouter::GetEdge(graph::EdgeId id) const
 {
-    return router_;
-}
-
-const graph::DirectedWeightedGraph<WeightValue>& TransportRouter::GetGraph() const
-{
-    return graph_;
+    return graph_.GetEdge(id);
 }

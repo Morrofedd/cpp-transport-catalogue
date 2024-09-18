@@ -108,12 +108,12 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				.Key("items").StartArray()
 				.StartDict()
 				.Key("stop_name").Value(std::string(from))
-				.Key("time").Value(router.GetGraph().GetEdge(0).weight)
+				.Key("time").Value(router.GetEdge(0).weight)
 				.Key("type").Value("Wait")
 				.EndDict();
 			result_route->edges.pop_back();
 			for (const auto& el : result_route->edges) {
-				graph::Edge temp = router.GetGraph().GetEdge(el);
+				graph::Edge temp = router.GetEdge(el);
 				TransportCatalogue::EdgeInfo info = catalogue.RouteInfo(temp.from, temp.to, temp.weight);
 				builder.StartDict();
 				if (info.type == edge_type::W_type) {
