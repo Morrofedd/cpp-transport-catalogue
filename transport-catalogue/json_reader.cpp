@@ -81,6 +81,8 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 			std::string_view from = request.AsDict().at("from").AsString();
 			std::string_view to = request.AsDict().at("to").AsString();
 
+			TransportRouter::PathInformation information;
+
 			json::Builder builder;
 
 
@@ -95,39 +97,31 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				continue;
 			}
 
-			auto result_route = router.BuildPath(request.AsDict().at("from").AsString(), request.AsDict().at("to").AsString());
+			router.BuildPath(information, request.AsDict().at("from").AsString(), request.AsDict().at("to").AsString());
 
-			if (result_route == std::nullopt) {
+			if (information.RInfo == std::nullopt) {
 				result.emplace_back(ErrorNode(request_id, "not found"));
 				continue;
 			}
 
 			builder.StartDict();
-			builder.Key("total_time").Value(result_route->weight)
+			builder.Key("total_time").Value(information.RInfo->weight)
 				.Key("request_id").Value(request_id)
-				.Key("items").StartArray()
-				.StartDict()
-				.Key("stop_name").Value(std::string(from))
-				.Key("time").Value(router.GetEdge(0).weight)
-				.Key("type").Value("Wait")
-				.EndDict();
-			result_route->edges.pop_back();
-			for (const auto& el : result_route->edges) {
-				graph::Edge temp = router.GetEdge(el);
-				TransportCatalogue::EdgeInfo info = catalogue.RouteInfo(temp.from, temp.to, temp.weight);
+				.Key("items").StartArray();
+			for (const auto& el : information.EInfo) {
 				builder.StartDict();
-				if (info.type == edge_type::W_type) {
+				if (el.type == edge_type::W_type) {
 					builder
-						.Key("stop_name").Value(std::string(info.bus_stop))
-						.Key("time").Value(info.time)
+						.Key("stop_name").Value(std::string(el.bus_stop))
+						.Key("time").Value(el.time)
 						.Key("type").Value("Wait").EndDict();
 					continue;
 				}
-				if (info.type == edge_type::B_type) {
+				if (el.type == edge_type::B_type) {
 					builder
-						.Key("bus").Value(std::string(info.bus_stop))
-						.Key("span_count").Value(info.span)
-						.Key("time").Value(info.time)
+						.Key("bus").Value(std::string(el.bus_stop))
+						.Key("span_count").Value(el.span)
+						.Key("time").Value(el.time)
 						.Key("type").Value("Bus").EndDict();
 					continue;
 				}

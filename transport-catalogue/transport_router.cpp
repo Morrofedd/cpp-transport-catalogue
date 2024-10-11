@@ -33,7 +33,7 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
                     ComputeTimeToTravel(length, bus_settings.velocity) / 60
             }
             );
-        }; // в отдельную функцию не выношу тк нужно передовать слишком много пораметров
+            }; // в отдельную функцию не выношу тк нужно передовать слишком много пораметров
 
         if (cur_route_ptr->is_roundtrip) {
             graph.AddEdge(
@@ -70,12 +70,19 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
     return graph;
 }
 
-std::optional<graph::Router<WeightValue>::RouteInfo> TransportRouter::BuildPath(std::string_view from, std::string_view to) const
+void TransportRouter::BuildPath(PathInformation& result, std::string_view from, std::string_view to) const
 {
-    return router_.BuildRoute(catalogue_.GetStopId(from),catalogue_.GetStopId(to));
-}
+    result.RInfo = router_.BuildRoute(catalogue_.GetStopId(from),catalogue_.GetStopId(to));
+    if (result.RInfo == std::nullopt) {
+        return;
+    }
 
-const graph::Edge<WeightValue>& TransportRouter::GetEdge(graph::EdgeId id) const
-{
-    return graph_.GetEdge(id);
+    graph::Edge temp = graph_.GetEdge(result.RInfo->edges.front());
+    result.EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.from, graph_.GetEdge(0).weight));
+    result.RInfo->edges.pop_back();
+
+    for (const auto& el : result.RInfo->edges) {
+        temp = graph_.GetEdge(el);
+        result.EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.to, temp.weight));
+    }
 }

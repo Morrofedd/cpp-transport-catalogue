@@ -10,6 +10,10 @@ private:
 	graph::DirectedWeightedGraph<WeightValue> BuildGraph(const TransportCatalogue::TransportCatalogue& catalogue)const;
 
 public:
+	struct PathInformation {
+		std::optional<graph::Router<WeightValue>::RouteInfo> RInfo;
+		std::vector<TransportCatalogue::EdgeInfo> EInfo;
+	};
 	TransportRouter() = delete;
 	TransportRouter(const TransportCatalogue::TransportCatalogue& catalogue) :
 		catalogue_(catalogue), 
@@ -17,9 +21,9 @@ public:
 		router_(graph_) //Cейчас по сути так и работает
 	{};
 
-	std::optional<graph::Router<WeightValue>::RouteInfo> BuildPath(std::string_view from,std::string_view to)const;
-	const graph::Edge<WeightValue>& GetEdge(graph::EdgeId id)const;// роутер не знает о гранях ничего кроме номера в графе
-private:
+	void BuildPath(PathInformation& result, std::string_view from, std::string_view to) const;
+
+private://они приватные а не публичные
 	const TransportCatalogue::TransportCatalogue& catalogue_;
 	graph::DirectedWeightedGraph<WeightValue> graph_;
 	graph::Router<WeightValue> router_;
