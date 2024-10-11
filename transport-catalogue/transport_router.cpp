@@ -33,7 +33,7 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
                     ComputeTimeToTravel(length, bus_settings.velocity) / 60
             }
             );
-            }; // понимаю что так делать не очень хорошо но что пришло в голову
+        }; // в отдельную функцию не выношу тк нужно передовать слишком много пораметров
 
         if (cur_route_ptr->is_roundtrip) {
             graph.AddEdge(
@@ -67,7 +67,6 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
         }
 
     }
-    //Нет хорошей идеи как это упростить
     return graph;
 }
 

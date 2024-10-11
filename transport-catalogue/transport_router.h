@@ -18,8 +18,7 @@ public:
 	{};
 
 	std::optional<graph::Router<WeightValue>::RouteInfo> BuildPath(std::string_view from,std::string_view to)const;
-	const graph::Edge<WeightValue>& GetEdge(graph::EdgeId id)const;//текста в "надо исправить" нет
-
+	const graph::Edge<WeightValue>& GetEdge(graph::EdgeId id)const;// роутер не знает о гранях ничего кроме номера в графе
 private:
 	const TransportCatalogue::TransportCatalogue& catalogue_;
 	graph::DirectedWeightedGraph<WeightValue> graph_;
