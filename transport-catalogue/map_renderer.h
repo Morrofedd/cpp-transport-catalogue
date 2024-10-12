@@ -103,7 +103,7 @@ public:
     void MapRander(std::ostream& output);
 
 private:
-    svg::Text MakeText(std::string, int, LayerType, request_type);
+    svg::Text MakeText(std::string, int, LayerType, RequestType);
     svg::Document MakeRenderDocument();
     std::set<std::string_view> MakeRoute(svg::Document&, std::string_view, int);
     void MakeNameOfRoute(svg::Document&, std::string_view, int);

@@ -188,14 +188,14 @@
 			if (from_stop == to_stop) {
 				result.bus_stop = from_stop;
 				result.time = time;
-				result.type = edge_type::W_type;
+				result.type = EdgeType::edge_wait_type;
 				return result;
 			}
 			std::pair<std::string_view, int> temp = FindBusAndSpan(from_stop, to_stop);
 			result.bus_stop = temp.first;
 			result.span = temp.second;
 			result.time = time;
-			result.type = edge_type::B_type;
+			result.type = EdgeType::edge_bus_type;
 			return result;
 		}
 

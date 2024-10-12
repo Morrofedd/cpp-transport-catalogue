@@ -20,17 +20,17 @@ void request_handler::RequestAnser(std::ostream& output)
     reader_.Print(output,catalogue_);
 }
 
-void request_handler::AddInformationInCatalogue(const std::vector<std::pair<request_type, RequestValue>>& request_queue)
+void request_handler::AddInformationInCatalogue(const std::vector<std::pair<RequestType, RequestValue>>& request_queue)
 {
     //LOG_DURATION_STREAM("AddInformationInCatalogue", std::cerr);
     for (const auto& el : request_queue) {
-        if (el.first == request_type::Stop_type) {
+        if (el.first == RequestType::stop_type) {
             TransportCatalogue::StopAndHisNaiboor stop = std::get<TransportCatalogue::StopAndHisNaiboor>(el.second);
             catalogue_.AddStop(stop.from);
             for (const auto& [to, range] : stop.to)
                 catalogue_.AddRangesBetweenStops(stop.from.name, to, range);
         }
-        if (el.first == request_type::Bus_type) {
+        if (el.first == RequestType::bus_type) {
             catalogue_.AddBus(std::get< TransportCatalogue::Bus>(el.second));
         }
     }

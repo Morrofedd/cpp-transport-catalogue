@@ -10,18 +10,20 @@ private:
 	graph::DirectedWeightedGraph<WeightValue> BuildGraph(const TransportCatalogue::TransportCatalogue& catalogue)const;
 
 public:
+
 	struct PathInformation {
-		std::optional<graph::Router<WeightValue>::RouteInfo> RInfo;
-		std::vector<TransportCatalogue::EdgeInfo> EInfo;
+		std::optional<graph::Router<WeightValue>::RouteInfo> RInfo;// структура на полное время марширута. не класс рутера
+		std::vector<TransportCatalogue::EdgeInfo> EInfo;// в предыдущих ревью вы говорили сделать так, как я понял. Сейчас результат заполняется по списку готовых решений (откуда, куда, время)
 	};
+
 	TransportRouter() = delete;
 	TransportRouter(const TransportCatalogue::TransportCatalogue& catalogue) :
 		catalogue_(catalogue), 
 		graph_(BuildGraph(catalogue)), 
-		router_(graph_) //Cейчас по сути так и работает
+		router_(graph_)
 	{};
 
-	void BuildPath(PathInformation& result, std::string_view from, std::string_view to) const;
+	PathInformation BuildPath(std::string_view from, std::string_view to) const;// решил сделать так из-за того что
 
 private://они приватные а не публичные
 	const TransportCatalogue::TransportCatalogue& catalogue_;

@@ -31,7 +31,6 @@ namespace TransportCatalogue {
 		void SetRouteSettings(double, double);
 		void SetRouteSettings(RouteSettings);
 		RouteSettings GetRouteSettings()const;
-		
 		mutable MinMaxCoords min_max_coords;
 	private:
 

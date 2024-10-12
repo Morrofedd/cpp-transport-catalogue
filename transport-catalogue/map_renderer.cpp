@@ -91,7 +91,7 @@ std::set<std::string_view> map_renderer::MakeRoute(svg::Document& doc, std::stri
 	return UsedStops;
 }
 
-svg::Text map_renderer::MakeText(std::string content, int index, LayerType l_type,request_type r_type)
+svg::Text map_renderer::MakeText(std::string content, int index, LayerType l_type,RequestType r_type)
 {
 	svg::Text result;
 
@@ -99,13 +99,13 @@ svg::Text map_renderer::MakeText(std::string content, int index, LayerType l_typ
 		.SetData(content)
 		.SetFontFamily("Verdana");
 
-	if (r_type == request_type::Stop_type) {
+	if (r_type == RequestType::stop_type) {
 		result
 			.SetFillColor("black")
 			.SetFontSize(settings_.stop_label_font_size)
 			.SetOffset(settings_.stop_label_offset);
 	}
-	if (r_type == request_type::Bus_type) {
+	if (r_type == RequestType::bus_type) {
 		result
 			.SetFillColor(settings_.color_palette.at(index % settings_.color_palette.size()))
 			.SetFontWeight("bold")
@@ -131,8 +131,8 @@ void map_renderer::MakeNameOfRoute(svg::Document& doc,std::string_view name, int
 		throw std::length_error("");
 	}
 
-	svg::Text lower_text = MakeText(std::string(name), index, LayerType::LOWER, request_type::Bus_type);
-	svg::Text upper_text = MakeText(std::string(name), index, LayerType::UPPER, request_type::Bus_type);
+	svg::Text lower_text = MakeText(std::string(name), index, LayerType::LOWER, RequestType::bus_type);
+	svg::Text upper_text = MakeText(std::string(name), index, LayerType::UPPER, RequestType::bus_type);
 
 	if (bus->is_roundtrip) {
 		upper_text.SetPosition(sp_(catalogue_.GetStop(bus->stops.at(0))->coord));
@@ -163,8 +163,8 @@ void map_renderer::MakeNameOfStop(svg::Document& doc, std::string_view name)
 {
 	TransportCatalogue::Stop* stop_ptr = catalogue_.GetStop(name);
 
-	svg::Text lower_text = MakeText(stop_ptr->name, 1, LayerType::LOWER, request_type::Stop_type);
-	svg::Text upper_text = MakeText(stop_ptr->name, 1, LayerType::UPPER, request_type::Stop_type);
+	svg::Text lower_text = MakeText(stop_ptr->name, 1, LayerType::LOWER, RequestType::stop_type);
+	svg::Text upper_text = MakeText(stop_ptr->name, 1, LayerType::UPPER, RequestType::stop_type);
 
 	upper_text.SetPosition(sp_(stop_ptr->coord));
 	lower_text.SetPosition(sp_(stop_ptr->coord));

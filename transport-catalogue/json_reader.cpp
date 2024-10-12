@@ -45,10 +45,10 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 	for (const auto& request : temp) {//request - map
 
 		int request_id = request.AsDict().at("id").AsInt();
-		request_type request_t = GetRequestType(request.AsDict().at("type").AsString());
+		RequestType request_t = GetRequestType(request.AsDict().at("type").AsString());
 		std::string_view name;
 
-		if (request_t == request_type::Stop_type) {
+		if (request_t == RequestType::stop_type) {
 			name = request.AsDict().at("name").AsString();
 			try {
 				result.emplace_back(StopToJSON(request_id, catalogue.GetStopInformation(name)));
@@ -57,7 +57,7 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				result.emplace_back(ErrorNode(request_id, e.what()));
 			}
 		}
-		if (request_t == request_type::Bus_type) {
+		if (request_t == RequestType::bus_type) {
 			name = request.AsDict().at("name").AsString();
 			try {
 				const TransportCatalogue::StatisticOfRoute stats = catalogue.GetStatisticOfRoute(name);
@@ -67,7 +67,7 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				result.emplace_back(ErrorNode(request_id, e.what()));
 			}
 		}
-		if (request_t == request_type::Map_type) {
+		if (request_t == RequestType::map_type) {
 			map_renderer render(catalogue, *this);
 			std::ostringstream os;
 			render.MapRander(os);
@@ -76,12 +76,10 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				.Key("request_id").Value(request_id)
 				.EndDict().Build());
 		}
-		if (request_t == request_type::Route_type) {
+		if (request_t == RequestType::route_type) {
 
 			std::string_view from = request.AsDict().at("from").AsString();
 			std::string_view to = request.AsDict().at("to").AsString();
-
-			TransportRouter::PathInformation information;
 
 			json::Builder builder;
 
@@ -97,7 +95,7 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				continue;
 			}
 
-			router.BuildPath(information, request.AsDict().at("from").AsString(), request.AsDict().at("to").AsString());
+			TransportRouter::PathInformation information = router.BuildPath(request.AsDict().at("from").AsString(), request.AsDict().at("to").AsString());
 
 			if (information.RInfo == std::nullopt) {
 				result.emplace_back(ErrorNode(request_id, "not found"));
@@ -110,14 +108,14 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 				.Key("items").StartArray();
 			for (const auto& el : information.EInfo) {
 				builder.StartDict();
-				if (el.type == edge_type::W_type) {
+				if (el.type == EdgeType::edge_wait_type) {
 					builder
 						.Key("stop_name").Value(std::string(el.bus_stop))
 						.Key("time").Value(el.time)
 						.Key("type").Value("Wait").EndDict();
 					continue;
 				}
-				if (el.type == edge_type::B_type) {
+				if (el.type == EdgeType::edge_bus_type) {
 					builder
 						.Key("bus").Value(std::string(el.bus_stop))
 						.Key("span_count").Value(el.span)
@@ -133,7 +131,7 @@ json::Node json_reader::StatRequestHundle(const TransportCatalogue::TransportCat
 			builder.EndDict();
 			result.emplace_back(builder.Build());
 		}
-		if (request_t == request_type::unknown_type) {
+		if (request_t == RequestType::unknown_type) {
 			continue;
 		}
 	}
@@ -179,14 +177,14 @@ TransportCatalogue::Bus JSONtoBus(const json::Node& root)
 	return result;
 }
 
-std::pair<request_type, RequestValue> JSONtoRequestElement(const json::Node& root)
+std::pair<RequestType, RequestValue> JSONtoRequestElement(const json::Node& root)
 {
-	request_type r_type = GetRequestType(root.AsDict().at("type").AsString());
-	if (r_type == request_type::Stop_type) {
-		return std::make_pair< request_type, RequestValue>(request_type::Stop_type, JSONtoStop(root));
+	RequestType r_type = GetRequestType(root.AsDict().at("type").AsString());
+	if (r_type == RequestType::stop_type) {
+		return std::make_pair< RequestType, RequestValue>(RequestType::stop_type, JSONtoStop(root));
 	}
-	if (r_type == request_type::Bus_type) {
-		return std::make_pair< request_type, RequestValue>(request_type::Bus_type, JSONtoBus(root));
+	if (r_type == RequestType::bus_type) {
+		return std::make_pair< RequestType, RequestValue>(RequestType::bus_type, JSONtoBus(root));
 	}
 	throw std::invalid_argument("unknown type");
 }
@@ -260,10 +258,10 @@ Settings::Settings(const json_reader& reader)
 	stop_label_offset = JSONtoPoint(temp.at("stop_label_offset").AsArray());
 }
 
-std::vector < std::pair< request_type, RequestValue>> BaseRequestHundle(const json::Node& root) {
+std::vector < std::pair< RequestType, RequestValue>> BaseRequestHundle(const json::Node& root) {
 
 	//LOG_DURATION_STREAM("BaseRequestHundle", std::cerr);
-	std::vector < std::pair< request_type, RequestValue>> result;
+	std::vector < std::pair< RequestType, RequestValue>> result;
 	result.reserve(root.AsArray().size());
 
 	for (const auto& request : root.AsArray()) {

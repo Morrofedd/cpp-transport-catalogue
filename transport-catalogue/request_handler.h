@@ -14,7 +14,7 @@ public:
 	void RequestAnser(std::ostream& output);
 
 private:
-	void AddInformationInCatalogue(const std::vector<std::pair<request_type, RequestValue>>& request_queue);
+	void AddInformationInCatalogue(const std::vector<std::pair<RequestType, RequestValue>>& request_queue);
 
 private:
 

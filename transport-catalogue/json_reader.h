@@ -26,8 +26,8 @@ json::Node ErrorNode(const int id, const std::string& error);
 TransportCatalogue::StopAndHisNaiboor JSONtoStop(const json::Node& root);
 TransportCatalogue::Bus JSONtoBus(const json::Node& root);
 
-std::pair<request_type, RequestValue> JSONtoRequestElement(const json::Node& root);
-std::vector < std::pair< request_type, RequestValue>> BaseRequestHundle(const json::Node& root);
+std::pair<RequestType, RequestValue> JSONtoRequestElement(const json::Node& root);
+std::vector < std::pair< RequestType, RequestValue>> BaseRequestHundle(const json::Node& root);
 TransportCatalogue::RouteSettings ParseTimeAndVelocity(const json::Node& root);
 
 struct Settings {

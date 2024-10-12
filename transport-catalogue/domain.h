@@ -10,19 +10,19 @@
 
 using namespace geo;
 
-enum request_type {
+enum RequestType {
 	unknown_type,
-	Bus_type,
-	Map_type,
-	Stop_type,
-	Route_type
+	bus_type,
+	map_type,
+	stop_type,
+	route_type
 };
-enum edge_type {
-	B_type,
-	W_type
+enum EdgeType {
+	edge_bus_type,
+	edge_wait_type
 };
 
-request_type GetRequestType(const std::string_view s_type);
+RequestType GetRequestType(const std::string_view s_type);
 
 namespace TransportCatalogue {
 	struct Stop {
@@ -56,7 +56,7 @@ namespace TransportCatalogue {
 		double time = 0;
 		int span = 0;
 		std::string_view bus_stop{};
-		edge_type type = edge_type::W_type;
+		EdgeType type = EdgeType::edge_wait_type;
 	};
 
 	struct StopAndHisNaiboor
@@ -75,8 +75,8 @@ using RequestValue = std::variant<TransportCatalogue::Bus, TransportCatalogue::S
 
 //time == seconds
 static inline double ComputeTimeToTravel(int range, double velocity) {
-	velocity = velocity * 1000 / 3600;
-	return range / velocity;
+	velocity = velocity * 1000 / 3600;// тут идет (double*int)/int = double | М/С
+	return range / velocity;//удобнее было воспринимать в системе СИ
 }
 
 using WeightValue = double;

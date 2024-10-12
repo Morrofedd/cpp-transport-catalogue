@@ -70,19 +70,23 @@ graph::DirectedWeightedGraph<WeightValue> TransportRouter::BuildGraph(const Tran
     return graph;
 }
 
-void TransportRouter::BuildPath(PathInformation& result, std::string_view from, std::string_view to) const
+TransportRouter::PathInformation TransportRouter::BuildPath(std::string_view from, std::string_view to) const
 {
-    result.RInfo = router_.BuildRoute(catalogue_.GetStopId(from),catalogue_.GetStopId(to));
-    if (result.RInfo == std::nullopt) {
-        return;
+    auto RInfo = router_.BuildRoute(catalogue_.GetStopId(from),catalogue_.GetStopId(to));
+    std::vector< TransportCatalogue::EdgeInfo> EInfo;
+    if (RInfo == std::nullopt) {
+        return { RInfo,EInfo };
     }
+    
 
-    graph::Edge temp = graph_.GetEdge(result.RInfo->edges.front());
-    result.EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.from, graph_.GetEdge(0).weight));
-    result.RInfo->edges.pop_back();
+    graph::Edge temp = graph_.GetEdge(RInfo->edges.front());
+    EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.from, graph_.GetEdge(0).weight));
+    RInfo->edges.pop_back();
 
-    for (const auto& el : result.RInfo->edges) {
+    for (const auto& el : RInfo->edges) {
         temp = graph_.GetEdge(el);
-        result.EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.to, temp.weight));
+        EInfo.push_back(catalogue_.RouteInfo(temp.from, temp.to, temp.weight));
     }
+
+    return { RInfo,EInfo };
 }
